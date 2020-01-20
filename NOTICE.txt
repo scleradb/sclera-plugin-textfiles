@@ -1,0 +1,2 @@
+Sclera - Text Files Connector
+Copyright 2012 - 2020 Sclera, Inc.
