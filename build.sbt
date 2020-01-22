@@ -4,6 +4,8 @@ description := "Add-on that enables Sclera to work with free-form text files"
 
 version := "4.0-SNAPSHOT"
 
+homepage := Some(url("https://github.com/scleradb/sclera-plugin-textfiles"))
+
 organization := "com.scleradb"
 
 organizationName := "Sclera, Inc."
