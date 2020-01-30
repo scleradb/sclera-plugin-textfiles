@@ -38,7 +38,7 @@ class TextFilesResult(
     /** Reads the text files and emits the data as an iterator on rows */
     override def rows: Iterator[ScalTableRow] = filesIter.map { f =>
         val src: Source = Source.fromFile(f)
-        val text: String = src.getLines().mkString(" ")
+        val text: String = src.getLines().mkString("\n")
         src.close()
 
         ScalTableRow(
