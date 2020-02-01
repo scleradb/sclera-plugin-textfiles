@@ -24,7 +24,7 @@ import com.scleradb.sql.expr.{SortExpr, CharConst}
 import com.scleradb.sql.datatypes.Column
 import com.scleradb.sql.result.{TableResult, ScalTableRow}
 
-/** Generates a table containing the contents of a CSV file
+/** Generates a table containing the contents of a text file
   *
   * @param columns Generated table's columns
   * @param filesIter Iterator over the text files
