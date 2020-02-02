@@ -17,8 +17,6 @@
 
 package com.scleradb.plugin.datasource.textfiles.source
 
-import java.io.File
-
 import com.scleradb.sql.types.SqlCharVarying
 import com.scleradb.sql.datatypes.Column
 import com.scleradb.sql.result.TableResult
@@ -34,16 +32,6 @@ class TextFilesSource(
     /** Name of the data source */
     override val name: String = TextFilesSource.name
 
-    /** Iterator over the files in the result */
-    private def files: Iterator[File] = {
-        def getFiles(fs: Iterator[File]): Iterator[File] = fs.flatMap { f =>
-            if( f.isDirectory ) getFiles(f.listFiles().iterator)
-            else Iterator(f)
-        }
-
-        getFiles(paths.iterator.map { path => new File(path) })
-    }
-
     /** Columns of the result (virtual table).
       * Total two columns; the first contains the file name,
       * and the second its contents.
@@ -54,7 +42,7 @@ class TextFilesSource(
     )
 
     /** TextFilesResult object to generate the result */
-    override def result: TableResult = new TextFilesResult(columns, files)
+    override def result: TableResult = TextFilesResult(columns, paths)
 
     /** String used for this source in the EXPLAIN output */
     override def toString: String =

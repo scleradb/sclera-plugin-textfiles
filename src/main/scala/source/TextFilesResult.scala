@@ -17,9 +17,6 @@
 
 package com.scleradb.plugin.datasource.textfiles.source
 
-import java.io.File
-import scala.io.Source
-
 import com.scleradb.sql.expr.{SortExpr, CharConst}
 import com.scleradb.sql.datatypes.Column
 import com.scleradb.sql.result.{TableResult, ScalTableRow}
@@ -27,24 +24,28 @@ import com.scleradb.sql.result.{TableResult, ScalTableRow}
 /** Generates a table containing the contents of a text file
   *
   * @param columns Generated table's columns
-  * @param filesIter Iterator over the text files
+  * @param paths List of paths of directories and text files
   */
 class TextFilesResult(
     override val columns: List[Column],
-    val filesIter: Iterator[File]
+    paths: List[String]
 ) extends TableResult {
     override val resultOrder: List[SortExpr] = Nil
 
     /** Reads the text files and emits the data as an iterator on rows */
-    override def rows: Iterator[ScalTableRow] = filesIter.map { f =>
-        val src: Source = Source.fromFile(f)
-        val text: String = try src.getLines().mkString("\n") finally src.close()
-
-        ScalTableRow(
-            "FILE" -> CharConst(f.getCanonicalPath()),
-            "CONTENTS" -> CharConst(text)
-        )
-    }
+    override def rows: Iterator[ScalTableRow] =
+        paths.iterator.flatMap(Content.iter).map { content =>
+            ScalTableRow(
+                "FILE" -> CharConst(content.name),
+                "CONTENTS" -> CharConst(content.text)
+            )
+        }
 
     override def close(): Unit = { }
+}
+
+object TextFilesResult {
+    /** Constructor */
+    def apply(columns: List[Column], paths: List[String]): TextFilesResult =
+        new TextFilesResult(columns, paths)
 }
