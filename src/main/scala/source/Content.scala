@@ -18,7 +18,7 @@
 package com.scleradb.plugin.datasource.textfiles.source
 
 import java.io.{File, InputStream, FileInputStream}
-import java.util.zip.ZipInputStream
+import java.util.zip.{ZipInputStream, GZIPInputStream}
 
 import scala.io.Source
 
@@ -41,6 +41,9 @@ object Content {
         if( name.endsWith(".zip") ) {
             val zis: ZipInputStream = new ZipInputStream(is)
             unzipIter(zis)
+        } else if( name.endsWith(".gz") ) {
+            val gzis: GZIPInputStream = new GZIPInputStream(is)
+            iter(name.substring(0, name.length - 3), gzis)
         } else {
             val src: Source = Source.fromInputStream(is)
             Iterator(apply(name, src.mkString))
