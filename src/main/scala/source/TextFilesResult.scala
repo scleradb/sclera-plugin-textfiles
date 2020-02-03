@@ -21,6 +21,8 @@ import com.scleradb.sql.expr.{SortExpr, CharConst}
 import com.scleradb.sql.datatypes.Column
 import com.scleradb.sql.result.{TableResult, ScalTableRow}
 
+import com.scleradb.util.tools.ContentIter
+
 /** Generates a table containing the contents of a text file
   *
   * @param columns Generated table's columns
