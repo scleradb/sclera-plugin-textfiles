@@ -20,25 +20,29 @@ package com.scleradb.plugin.datasource.textfiles.source
 import java.io.{File, InputStream, FileInputStream}
 import java.util.zip.{ZipInputStream, GZIPInputStream}
 
+import scala.collection.mutable
 import scala.io.Source
 
-/** Content of a file */
-class Content(val name: String, val text: String)
-
 /** Recursively iterate over the files in a directory/zip file */
-object Content {
-    def apply(name: String, text: String): Content = new Content(name, text)
+class ContentIter(filterOpt: Option[String => Boolean]) {
+    /** Content of a file */
+    class Content(val name: String, val text: String)
+
+    private val streams: mutable.ListBuffer[InputStream] = mutable.ListBuffer()
 
     def iter(path: String): Iterator[Content] = iter(new File(path))
 
     def iter(f: File): Iterator[Content] =
         if( f.isDirectory ) f.listFiles.iterator.flatMap(iter) else {
             val fis: FileInputStream = new FileInputStream(f)
-            try iter(f.getName, fis).toList.iterator finally fis.close()
+            streams.append(fis)
+            iter(f.getName, fis)
         }
 
     def iter(name: String, is: InputStream): Iterator[Content] =
-        if( name.endsWith(".zip") ) {
+        if( filterOpt.exists(filter => !filter(name)) ) {
+            Iterator()
+        } else if( name.endsWith(".zip") ) {
             val zis: ZipInputStream = new ZipInputStream(is)
             unzipIter(zis)
         } else if( name.endsWith(".gz") ) {
@@ -46,7 +50,7 @@ object Content {
             iter(name.substring(0, name.length - 3), gzis)
         } else {
             val src: Source = Source.fromInputStream(is)
-            Iterator(apply(name, src.mkString))
+            Iterator(new Content(name, src.mkString))
         }
 
     def unzipIter(zis: ZipInputStream): Iterator[Content] =
@@ -55,4 +59,14 @@ object Content {
             case Some(zipEntry) => iter(zipEntry.getName, zis) ++ unzipIter(zis)
             case None => Iterator()
         }
+
+    def close(): Unit = {
+        streams.foreach { is => is.close() }
+        streams.clear()
+    }
+}
+
+object ContentIter {
+    def apply(filterOpt: Option[String => Boolean] = None): ContentIter =
+        new ContentIter(filterOpt)
 }

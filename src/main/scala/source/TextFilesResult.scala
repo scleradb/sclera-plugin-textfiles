@@ -31,17 +31,18 @@ class TextFilesResult(
     paths: List[String]
 ) extends TableResult {
     override val resultOrder: List[SortExpr] = Nil
+    private val contentIter: ContentIter = ContentIter()
 
     /** Reads the text files and emits the data as an iterator on rows */
     override def rows: Iterator[ScalTableRow] =
-        paths.iterator.flatMap(Content.iter).map { content =>
+        paths.iterator.flatMap(contentIter.iter).map { content =>
             ScalTableRow(
                 "FILE" -> CharConst(content.name),
                 "CONTENTS" -> CharConst(content.text)
             )
         }
 
-    override def close(): Unit = { }
+    override def close(): Unit = { contentIter.close() }
 }
 
 object TextFilesResult {
