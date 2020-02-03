@@ -53,7 +53,7 @@ class TextFilesSource(
 }
 
 object TextFilesSource {
-    /** The data source name */
+    /** Name of the data source */
     val name: String = "TEXTFILES"
 
     def apply(rootPath: String, patterns: List[String]): TextFilesSource =

@@ -36,10 +36,13 @@ class Content(val name: String, val text: String)
   * @param filterOpt If present, process only file names accepted by this filter
   */
 class ContentIter(filterOpt: Option[String => Boolean]) {
+    /** Accumulates input streams that need to be closed */
     private val streams: mutable.ListBuffer[InputStream] = mutable.ListBuffer()
 
+    /** Contents of the file/directory given by the path */
     def iter(path: String): Iterator[Content] = iter(new File(path))
 
+    /** Contents of the file/directory */
     def iter(f: File): Iterator[Content] =
         if( f.isDirectory ) f.listFiles.iterator.flatMap(iter) else {
             val fis: FileInputStream = new FileInputStream(f)
@@ -47,6 +50,7 @@ class ContentIter(filterOpt: Option[String => Boolean]) {
             iter(f.getName, fis)
         }
 
+    /** Contents of the input stream */
     def iter(name: String, is: InputStream): Iterator[Content] =
         if( filterOpt.exists(filter => !filter(name)) ) {
             Iterator()
@@ -61,6 +65,7 @@ class ContentIter(filterOpt: Option[String => Boolean]) {
             Iterator(new Content(name, src.mkString))
         }
 
+    /** Contents of the zipped input stream */
     def unzipIter(zis: ZipInputStream): Iterator[Content] =
         Option(zis.getNextEntry) match {
             case Some(zipEntry) if( zipEntry.isDirectory ) => unzipIter(zis)
@@ -68,6 +73,7 @@ class ContentIter(filterOpt: Option[String => Boolean]) {
             case None => Iterator()
         }
 
+    /** Close accumulated input streams */
     def close(): Unit = {
         streams.foreach { is => is.close() }
         streams.clear()
