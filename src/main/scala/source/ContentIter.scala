@@ -24,11 +24,18 @@ import java.util.zip.{ZipInputStream, GZIPInputStream}
 import scala.collection.mutable
 import scala.io.Source
 
-/** Recursively iterate over the files in a directory/zip file */
-class ContentIter(filterOpt: Option[String => Boolean]) {
-    /** Content of a file */
-    class Content(val name: String, val text: String)
+/** Content of a file
+ *
+ * @param name File name
+ * @param text File's text content
+ */
+class Content(val name: String, val text: String)
 
+/** Recursively iterate over the files in a directory/zip file
+  *
+  * @param filterOpt If present, process only file names accepted by this filter
+  */
+class ContentIter(filterOpt: Option[String => Boolean]) {
     private val streams: mutable.ListBuffer[InputStream] = mutable.ListBuffer()
 
     def iter(path: String): Iterator[Content] = iter(new File(path))
