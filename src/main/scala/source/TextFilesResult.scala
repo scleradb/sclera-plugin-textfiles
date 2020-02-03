@@ -24,18 +24,20 @@ import com.scleradb.sql.result.{TableResult, ScalTableRow}
 /** Generates a table containing the contents of a text file
   *
   * @param columns Generated table's columns
-  * @param paths List of paths of directories and text files
+  * @param rootPath Root directory or file
+  * @param patterns Patterns of files names to be processed (Nil processes all)
   */
 class TextFilesResult(
     override val columns: List[Column],
-    paths: List[String]
+    rootPath: String,
+    patterns: List[String]
 ) extends TableResult {
     override val resultOrder: List[SortExpr] = Nil
-    private val contentIter: ContentIter = ContentIter()
+    private val contentIter: ContentIter = ContentIter(patterns)
 
     /** Reads the text files and emits the data as an iterator on rows */
     override def rows: Iterator[ScalTableRow] =
-        paths.iterator.flatMap(contentIter.iter).map { content =>
+        contentIter.iter(rootPath).map { content =>
             ScalTableRow(
                 "FILE" -> CharConst(content.name),
                 "CONTENTS" -> CharConst(content.text)
@@ -46,7 +48,10 @@ class TextFilesResult(
 }
 
 object TextFilesResult {
-    /** Constructor */
-    def apply(columns: List[Column], paths: List[String]): TextFilesResult =
-        new TextFilesResult(columns, paths)
+    def apply(
+        columns: List[Column],
+        rootPath: String,
+        patterns: List[String]
+    ): TextFilesResult =
+        new TextFilesResult(columns, rootPath, patterns)
 }

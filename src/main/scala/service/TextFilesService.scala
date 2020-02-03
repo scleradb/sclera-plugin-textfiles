@@ -33,20 +33,24 @@ class TextFilesService extends ExternalSourceService {
     override def createSource(
         params: List[ScalValueBase]
     ): TextFilesSource = {
-        if( params == Nil )
-            throw new IllegalArgumentException(
-                "Input files not specified for \"" + id + "\""
-            )
-
-        val fileNames: List[String] = params.map {
-            case CharConst(s) if( s != "" ) => s
-            case v =>
+        val strParams: List[String] = params.zipWithIndex.map {
+            case (CharConst(s), _) if( s != "" ) => s
+            case (v, 0) =>
                 throw new IllegalArgumentException(
-                    "Illegal file name specified for \"" + id +
-                    "\": " + v.repr
+                    s"Illegal file name specified for $id: ${v.repr}"
+                )
+            case (v, i) =>
+                throw new IllegalArgumentException(
+                    s"Illegal extension specified for $id: ${v.repr} [$i]"
                 )
         }
 
-        new TextFilesSource(fileNames)
+        strParams match {
+            case rootPath::patterns => TextFilesSource(rootPath, patterns)
+            case Nil =>
+                throw new IllegalArgumentException(
+                    "Input file not specified for \"" + id + "\""
+                )
+        }
     }
 }

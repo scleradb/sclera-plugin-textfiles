@@ -17,6 +17,7 @@
 
 package com.scleradb.plugin.datasource.textfiles.source
 
+import java.nio.file.{Path, PathMatcher, FileSystem, FileSystems}
 import java.io.{File, InputStream, FileInputStream}
 import java.util.zip.{ZipInputStream, GZIPInputStream}
 
@@ -69,4 +70,15 @@ class ContentIter(filterOpt: Option[String => Boolean]) {
 object ContentIter {
     def apply(filterOpt: Option[String => Boolean] = None): ContentIter =
         new ContentIter(filterOpt)
+
+    def apply(patterns: List[String]): ContentIter = apply(filterOpt(patterns))
+
+    /** File name filter that accepts if name matches any of the patterns */
+    private def filterOpt(patterns: List[String]): Option[String => Boolean] =
+        if( patterns.isEmpty ) None else {
+            val fs: FileSystem = FileSystems.getDefault()
+            val matchers: List[PathMatcher] =
+                patterns.map { pattern => fs.getPathMatcher(s"glob:$pattern") }
+            Some(path => matchers.exists { m => m.matches(Path.of(path)) })
+        }
 }

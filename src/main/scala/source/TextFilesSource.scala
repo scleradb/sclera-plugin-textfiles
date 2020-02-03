@@ -24,10 +24,12 @@ import com.scleradb.sql.result.TableResult
 import com.scleradb.external.objects.ExternalSource
 
 /** Text files data source
-  * @param paths List of paths of directories and text files
+  * @param rootPath Root directory or file
+  * @param patterns Patterns of files names to be processed (Nil processes all)
   */
 class TextFilesSource(
-    paths: List[String]
+    rootPath: String,
+    patterns: List[String]
 ) extends ExternalSource {
     /** Name of the data source */
     override val name: String = TextFilesSource.name
@@ -42,14 +44,18 @@ class TextFilesSource(
     )
 
     /** TextFilesResult object to generate the result */
-    override def result: TableResult = TextFilesResult(columns, paths)
+    override def result: TableResult =
+        TextFilesResult(columns, rootPath, patterns)
 
     /** String used for this source in the EXPLAIN output */
     override def toString: String =
-        "%s(\"%s\")".format(name, paths.mkString(","))
+        s"$name($rootPath :: ${patterns.mkString(",")})"
 }
 
 object TextFilesSource {
     /** The data source name */
     val name: String = "TEXTFILES"
+
+    def apply(rootPath: String, patterns: List[String]): TextFilesSource =
+        new TextFilesSource(rootPath, patterns)
 }
