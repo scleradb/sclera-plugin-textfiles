@@ -46,7 +46,7 @@ class TextFilesResult(
             )
         }
 
-    override def close(): Unit = { contentIter.close() }
+    override def close(): Unit = contentIter.close()
 }
 
 object TextFilesResult {
