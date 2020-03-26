@@ -31,19 +31,24 @@ import com.scleradb.exec.Processor
 
 class TextFilesTestSuite extends AnyFunSpec with CancelAfterFailure {
     var processor: Processor = null
+    var textFile: File = null
 
-    val textFile: File = File.createTempFile("test", "text")
-    val textFileName: String = textFile.getCanonicalPath()
-    val textContents: String = "foo bar"
+    def textFileName: String = textFile.getCanonicalPath()
+    def textContents: String = "foo bar"
 
     describe("TEXTFILES Query Processing") {
         it("should setup") {
+            processor = Processor()
+            processor.init()
+        }
+
+        it("should create textfile") {
+            textFile = File.createTempFile("test", "text")
+            textFile.deleteOnExit()
+
             val text: PrintWriter = new PrintWriter(textFile)
             text.write(textContents)
             text.close()
-
-            processor = Processor()
-            processor.init()
         }
 
         it("should execute a TEXTFILES query (1 file)") {
@@ -74,8 +79,7 @@ class TextFilesTestSuite extends AnyFunSpec with CancelAfterFailure {
         }
 
         it("should teardown") {
-            textFile.delete()
-            processor.close()
+            Option(processor).foreach(_.close())
         }
     }
 }
