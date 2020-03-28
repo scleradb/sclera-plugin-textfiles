@@ -1,5 +1,7 @@
 # Sclera - Text Files Connector
 
+[![Build Status](https://travis-ci.org/scleradb/sclera-plugin-textfiles.svg?branch=master)](https://travis-ci.org/scleradb/sclera-plugin-textfiles)
+
 Enables Sclera to work with free-form text files.
 
 The text files are viewed as tables, with two columns: an identifier column containing the file's path, and another column containing the file's contents. These files can now be accessed in a manner similar to tables in a SQL query.
