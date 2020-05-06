@@ -1,6 +1,8 @@
 # Sclera - Text Files Connector
 
 [![Build Status](https://travis-ci.org/scleradb/sclera-plugin-textfiles.svg?branch=master)](https://travis-ci.org/scleradb/sclera-plugin-textfiles)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.scleradb/sclera-plugin-textfiles_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.scleradb/sclera-plugin-textfiles_2.13)
+[![scaladoc](https://javadoc.io/badge2/com.scleradb/sclera-plugin-textfiles_2.13/scaladoc.svg)](https://javadoc.io/doc/com.scleradb/sclera-plugin-textfiles_2.13)
 
 Enables Sclera to work with free-form text files.
 
